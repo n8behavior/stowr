@@ -3,7 +3,7 @@
 [web.app]
 
 # HTML title tag content
-title = "stowr-app"
+title = "stowr-gui"
 
 # include `assets` in web platform
 [web.resource]

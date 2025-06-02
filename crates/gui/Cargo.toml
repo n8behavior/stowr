@@ -1,5 +1,5 @@
 [package]
-name = "stowr-app"
+name = "stowr-gui"
 version = "0.1.0"
 authors = ["Mike Sandman <mike@thesandmans.com>"]
 edition = "2021"
