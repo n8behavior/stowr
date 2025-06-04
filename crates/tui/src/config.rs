@@ -609,4 +609,9 @@ mod tests {
             KeyEvent::new(KeyCode::Enter, KeyModifiers::ALT)
         );
     }
+
+    #[test]
+    fn test_parse_color_bright_color1() {
+        assert_eq!(parse_color("bright color1"), Some(Color::Indexed(9)));
+    }
 }
