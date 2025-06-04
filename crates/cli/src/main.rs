@@ -4,7 +4,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// Name of the asses to show
+    /// Name of the asset to show
     #[arg(short, long)]
     name: String,
 }
