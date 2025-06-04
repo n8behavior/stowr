@@ -391,11 +391,10 @@ fn parse_color(s: &str) -> Option<Color> {
             .trim_start_matches("color")
             .parse::<u8>()
             .unwrap_or_default();
-        // Bright colors start at index 8 in the ANSI color palette. The
-        // previous implementation incorrectly used a bit shift which would
-        // overflow and always return 0. Use wrapping_add to safely offset the
-        // parsed color value instead.
-        Some(Color::Indexed(c.wrapping_add(8)))
+        // Bright colors start at index 8 in the ANSI color palette. Offset the
+        // parsed value by 8 (or equivalently set the 4th bit) to convert a
+        // normal color number into its bright variant.
+        Some(Color::Indexed(c | 8))
     } else if s.contains("color") {
         let c = s
             .trim_start_matches("color")
@@ -502,10 +501,9 @@ mod tests {
     fn test_parse_color_bright() {
         assert_eq!(parse_color("bright color0"), Some(Color::Indexed(8)));
         assert_eq!(parse_color("bright color1"), Some(Color::Indexed(9)));
-        // Ensure the high end of the allowed range does not overflow
         assert_eq!(parse_color("bright color7"), Some(Color::Indexed(15)));
-        // Inputs that exceed the u8 range should not panic and should wrap
-        assert_eq!(parse_color("bright color255"), Some(Color::Indexed(7)));
+        // Values beyond the standard range simply set the bright bit
+        assert_eq!(parse_color("bright color255"), Some(Color::Indexed(255)));
     }
 
     #[test]
