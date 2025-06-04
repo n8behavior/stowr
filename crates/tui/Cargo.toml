@@ -2,7 +2,7 @@
 name = "stowr-tui"
 version = "0.1.0"
 edition = "2024"
-description = "Ratatui-base UI for Stowr"
+description = "Ratatui-based UI for Stowr"
 authors = ["Mike Sandman <mike@thesandmans.com>"]
 build = "build.rs"
 
