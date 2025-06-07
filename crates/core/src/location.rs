@@ -1,30 +1,36 @@
+use serde::{Deserialize, Serialize};
+
+use crate::common::{Repository, RepositoryId};
+
 /// Persistence abstraction for [`Location`] data.
 ///
-/// Similar to `AssetRepository`, this trait defines the operations required by
+/// this trait defines the operations required by
 /// the domain logic without committing to any specific database layer.
-pub trait LocationRepository {
-    /// Retrieve a location by id.
-    fn fetch(&self, id: u64) -> Option<Location>;
+pub trait LocationRepository: Repository<Entity = Location, Id = LocationId> {}
 
-    /// Save a new or updated location.
-    fn store(&self, location: &Location);
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum LocationTag {}
+
+pub type LocationId = RepositoryId<LocationTag>;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Location {
+    pub id: LocationId,
+    pub name: String,
 }
 
-pub fn new_location(id: u64, name: impl Into<String>) -> Location {
+pub fn new_location(id: LocationId, name: impl Into<String>) -> Location {
     Location {
         id,
         name: name.into(),
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Location {
-    pub id: u64,
-    pub name: String,
-}
 
 #[test]
 fn creates_location() {
-    let loc = new_location(1, "warehouse");
-    assert_eq!(loc.id, 1);
+    let id = LocationId::new();
+    let name = "warehouse";
+    let loc = new_location(id.clone(), name);
+    assert_eq!(loc.id, id);
     assert_eq!(loc.name, "warehouse");
 }

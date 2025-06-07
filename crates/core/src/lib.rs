@@ -1,5 +1,6 @@
 pub mod asset;
 pub mod auth;
+mod common;
 pub mod db;
 pub mod error;
 pub mod group;

@@ -1,31 +1,33 @@
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
 /// Abstract persistence operations for [`Asset`].
 ///
 /// This trait represents the "port" for saving and retrieving assets without
 /// exposing any database implementation details to the rest of the domain code.
-pub trait AssetRepository {
-    /// Fetch an asset by id.
-    fn fetch(&self, id: u64) -> Option<Asset>;
+pub trait AssetRepository {}
 
-    /// Persist a new asset or update an existing one.
-    fn store(&self, asset: &Asset);
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Asset {
+    pub id: AssetId,
+    pub name: String,
 }
 
-pub fn new_asset(id: u64, name: impl Into<String>) -> Asset {
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AssetId(pub Uuid);
+
+pub fn new_asset(id: AssetId, name: impl Into<String>) -> Asset {
     Asset {
         id,
         name: name.into(),
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Asset {
-    pub id: u64,
-    pub name: String,
-}
-
 #[test]
 fn creates_asset() {
-    let asset = new_asset(1, "test");
-    assert_eq!(asset.id, 1);
+    let id = AssetId(Uuid::new_v4());
+    let name = "test";
+    let asset = new_asset(id.clone(), name);
+    assert_eq!(asset.id, id);
     assert_eq!(asset.name, "test");
 }
