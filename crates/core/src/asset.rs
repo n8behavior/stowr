@@ -4,7 +4,7 @@
 /// exposing any database implementation details to the rest of the domain code.
 pub trait AssetRepository {
     /// Fetch an asset by id.
-    fn get(&self, id: u64) -> Option<Asset>;
+    fn fetch(&self, id: u64) -> Option<Asset>;
 
     /// Persist a new asset or update an existing one.
     fn store(&self, asset: &Asset);

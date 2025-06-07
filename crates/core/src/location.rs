@@ -4,7 +4,7 @@
 /// the domain logic without committing to any specific database layer.
 pub trait LocationRepository {
     /// Retrieve a location by id.
-    fn get(&self, id: u64) -> Option<Location>;
+    fn fetch(&self, id: u64) -> Option<Location>;
 
     /// Save a new or updated location.
     fn store(&self, location: &Location);
