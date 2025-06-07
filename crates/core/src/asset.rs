@@ -1,5 +1,3 @@
-use super::model::Asset;
-
 /// Abstract persistence operations for [`Asset`].
 ///
 /// This trait represents the "port" for saving and retrieving assets without
@@ -13,5 +11,21 @@ pub trait AssetRepository {
 }
 
 pub fn new_asset(id: u64, name: impl Into<String>) -> Asset {
-    Asset { id, name: name.into() }
+    Asset {
+        id,
+        name: name.into(),
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Asset {
+    pub id: u64,
+    pub name: String,
+}
+
+#[test]
+fn creates_asset() {
+    let asset = new_asset(1, "test");
+    assert_eq!(asset.id, 1);
+    assert_eq!(asset.name, "test");
 }
