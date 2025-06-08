@@ -18,10 +18,12 @@ pub struct Asset {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AssetId(pub Uuid);
 
-pub fn new(id: AssetId, name: impl Into<String>) -> Asset {
-    Asset {
-        id,
-        name: name.into(),
+impl Asset {
+    fn new(id: AssetId, name: impl Into<String>) -> Asset {
+        Asset {
+            id,
+            name: name.into(),
+        }
     }
 }
 
@@ -29,7 +31,7 @@ pub fn new(id: AssetId, name: impl Into<String>) -> Asset {
 fn creates_asset() {
     let id = AssetId(Uuid::new_v4());
     let name = "test";
-    let asset = new(id.clone(), name);
+    let asset = Asset::new(id.clone(), name);
     assert_eq!(asset.id, id);
     assert_eq!(asset.name, "test");
 }

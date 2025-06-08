@@ -77,12 +77,38 @@ impl<T> From<RepositoryId<T>> for Uuid {
 mod tests {
     use super::*;
     use std::str::FromStr;
-    use crate::location::LocationTag;
 
-    type DummyId = RepositoryId<LocationTag>;
+    #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+    enum DummyTag {}
+
+    type DummyId = RepositoryId<DummyTag>;
+
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    struct DummyAsset {
+        id: DummyId,
+        name: String,
+    }
+
+    impl DummyAsset {
+        fn new(id: DummyId, name: impl Into<String>) -> DummyAsset {
+            DummyAsset {
+                id,
+                name: name.into(),
+            }
+        }
+    }
 
     #[test]
-    fn new_produces_unique_ids() {
+    fn dummy_new_create_dummies() {
+        let id = DummyId::new();
+        let name = "warehouse";
+        let loc = DummyAsset::new(id.clone(), name);
+        assert_eq!(loc.id, id);
+        assert_eq!(loc.name, "warehouse");
+    }
+    #[test]
+
+    fn dummy_id_new_produces_unique_ids() {
         let a = DummyId::new();
         let b = DummyId::new();
         assert_ne!(a, b, "sequential new() calls should yield different IDs");
