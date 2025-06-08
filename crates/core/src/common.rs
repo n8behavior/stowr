@@ -72,3 +72,35 @@ impl<T> From<RepositoryId<T>> for Uuid {
         id.value
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+    use crate::location::LocationTag;
+
+    type DummyId = RepositoryId<LocationTag>;
+
+    #[test]
+    fn new_produces_unique_ids() {
+        let a = DummyId::new();
+        let b = DummyId::new();
+        assert_ne!(a, b, "sequential new() calls should yield different IDs");
+    }
+
+    #[test]
+    fn roundtrip_uuid_via_into_and_from() {
+        let original = DummyId::new();
+        let uuid: Uuid = original.clone().into();
+        let reconstructed: DummyId = uuid.into();
+        assert_eq!(original, reconstructed);
+    }
+
+    #[test]
+    fn parse_from_string_roundtrip() {
+        let original = DummyId::new();
+        let s = original.to_string();
+        let parsed = DummyId::from_str(&s).expect("valid uuid string");
+        assert_eq!(original, parsed);
+    }
+}
