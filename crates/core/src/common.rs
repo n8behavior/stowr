@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::{fmt, marker::PhantomData, str::FromStr};
 use uuid::Uuid;
 
-/// A generic CRUD interface.
+/// Base trait for all domain repositories.
 /// - [Entity] is the domain type (e.g. [Asset], [Location]).  
 /// - [Id] is the type of its primary‐key (e.g. [AssetId], [LocationId]).
 #[async_trait]

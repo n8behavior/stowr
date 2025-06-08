@@ -19,7 +19,7 @@ pub struct Location {
     pub name: String,
 }
 
-pub fn new_location(id: LocationId, name: impl Into<String>) -> Location {
+pub fn new(id: LocationId, name: impl Into<String>) -> Location {
     Location {
         id,
         name: name.into(),
@@ -30,7 +30,7 @@ pub fn new_location(id: LocationId, name: impl Into<String>) -> Location {
 fn creates_location() {
     let id = LocationId::new();
     let name = "warehouse";
-    let loc = new_location(id.clone(), name);
+    let loc = new(id.clone(), name);
     assert_eq!(loc.id, id);
     assert_eq!(loc.name, "warehouse");
 }
