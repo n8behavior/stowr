@@ -75,34 +75,77 @@ impl<T> From<RepositoryId<T>> for Uuid {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Mutex;
+
     use super::*;
-    use std::str::FromStr;
+    use crate::common::Repository;
 
     #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
     enum DummyTag {}
 
     type DummyId = RepositoryId<DummyTag>;
 
-    #[derive(Clone, Debug, Serialize, Deserialize)]
-    struct DummyAsset {
+    #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+    struct Dummy {
         id: DummyId,
         name: String,
     }
 
-    impl DummyAsset {
-        fn new(id: DummyId, name: impl Into<String>) -> DummyAsset {
-            DummyAsset {
+    impl Dummy {
+        fn new(id: DummyId, name: impl Into<String>) -> Dummy {
+            Dummy {
                 id,
                 name: name.into(),
             }
         }
     }
 
+    struct VectorDummyRepo {
+        db: Mutex<Vec<Dummy>>,
+    }
+
+    impl VectorDummyRepo {
+        fn new() -> Self {
+            VectorDummyRepo {
+                db: Mutex::new(Vec::new()),
+            }
+        }
+    }
+
+    #[async_trait]
+    impl Repository for VectorDummyRepo {
+        type Entity = Dummy;
+        type Id = DummyId;
+
+        async fn create(&self, entity: Dummy) -> Result<Dummy> {
+            let mut guard = self.db.lock().unwrap();
+            guard.push(entity.clone());
+            Ok(entity)
+        }
+
+        async fn fetch(&self, id: DummyId) -> Result<Option<Dummy>> {
+            let guard = self.db.lock().unwrap();
+            Ok(guard.iter().cloned().find(|d| d.id == id))
+        }
+    }
+
+    #[tokio::test]
+    async fn dummy_repo_can_create_and_fetch() {
+        let repo = VectorDummyRepo::new();
+        let id = DummyId::new();
+        let item = Dummy::new(id.clone(), "warehouse");
+        let created = repo.create(item.clone()).await.unwrap();
+        assert_eq!(created, item);
+
+        let fetched = repo.fetch(id.clone()).await.unwrap();
+        assert_eq!(fetched, Some(item));
+    }
+
     #[test]
     fn dummy_new_create_dummies() {
         let id = DummyId::new();
         let name = "warehouse";
-        let loc = DummyAsset::new(id.clone(), name);
+        let loc = Dummy::new(id.clone(), name);
         assert_eq!(loc.id, id);
         assert_eq!(loc.name, "warehouse");
     }
