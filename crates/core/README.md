@@ -28,13 +28,14 @@ generic `Repository` trait and type-safe IDs.
 
 > **You’ll create:**
 >
-> 1. A type-safe ID (e.g., `LocationId`)
-> 2. The entity struct (e.g., `Location`)
-> 3. A repository trait alias (e.g., `LocationRepository`)
-> 4. A repository implementation (e.g., `VectorLocationRepo` for in-memory/test)
-> 5. Tests to prove it all works
+> - The [type-safe ID](#define-the-entity-id) (e.g., `LocationId`)
+> - The [entity struct](#define-the-entity-struct) (e.g., `Location`)
+> - The [repository trait alias](#define-the-repository-trait-alias) (e.g., `LocationRepository`)
+> - A simple [repository implementation](#implement-a-repository) (e.g.,
+>   `VectorLocationRepo` for in-memory/test)
+> - [Tests](#write-a-test) to prove it all works
 
-### 1. **Define the Entity ID**
+### Define the Entity ID
 
 Use the generic `RepositoryId<T>` to create a unique, type-safe ID for your entity.
 
@@ -45,7 +46,7 @@ enum LocationTag {} // Empty marker type
 type LocationId = RepositoryId<LocationTag>; // ergonomic type alias
 ```
 
-### 2. **Define the Entity Struct**
+### Define the Entity Struct
 
 Make your entity struct. Include its ID and any other relevant fields.
 
@@ -64,7 +65,7 @@ impl Location {
 }
 ```
 
-### 3. **Define the Repository Trait Alias**
+### Define the Repository Trait Alias
 
 For clarity, define a trait alias for your new entity’s repository:
 
@@ -75,7 +76,7 @@ trait LocationRepository: Repository<Entity = Location, Id = LocationId> {}
 This enables you to refer to “any repository of `Location`” in a type-safe,
 concise way.
 
-### 4. **Implement a Repository (In-Memory Example)**
+### Implement a Repository
 
 Here’s a simple in-memory repository using a `Mutex<Vec<Location>>`.
 For real use, you’d implement a DB-backed version.
@@ -114,7 +115,7 @@ impl Repository for VectorLocationRepo {
 impl LocationRepository for VectorLocationRepo {}
 ```
 
-### 5. **Write a Test**
+### Write a Test
 
 Here’s a minimal test for the repository:
 
