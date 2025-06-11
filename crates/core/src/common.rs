@@ -29,6 +29,12 @@ pub struct RepositoryId<T> {
     _marker: PhantomData<T>,
 }
 
+impl<T> Default for RepositoryId<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> RepositoryId<T> {
     /// Create a brand-new v4 UUID
     pub fn new() -> Self {
@@ -129,9 +135,14 @@ mod tests {
         }
     }
 
+    impl DummyRepository for VectorDummyRepo {}
+
+    trait DummyRepository: Repository<Entity = Dummy, Id = DummyId> {}
+
     #[tokio::test]
     async fn dummy_repo_can_create_and_fetch() {
-        let repo = VectorDummyRepo::new();
+        let concrete = VectorDummyRepo::new();
+        let repo: &dyn DummyRepository = &concrete;
         let id = DummyId::new();
         let item = Dummy::new(id.clone(), "warehouse");
         let created = repo.create(item.clone()).await.unwrap();

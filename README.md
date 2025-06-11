@@ -1,6 +1,10 @@
 # stowr
 
-**stowr** is a modular, Rust‐powered asset management system with three distinct user interfaces (CLI, TUI, and GUI) and a shared core domain model. Whether you prefer a lightweight command‐line tool, a rich terminal interface, or a modern web/desktop GUI (via Dioxus), stowr has you covered. It’s designed for flexibility, strong type safety, and clean separation of concerns.
+**stowr** is a modular, Rust‐powered asset management system with three distinct
+user interfaces (CLI, TUI, and GUI) and a shared core domain model. Whether you
+prefer a lightweight command‐line tool, a rich terminal interface, or a modern
+web/desktop GUI (via Dioxus), stowr has you covered. It’s designed for
+flexibility, strong type safety, and clean separation of concerns.
 
 ---
 
@@ -8,8 +12,8 @@
 
 ### Prerequisites
 
-* **Rust & Cargo** (≥ 1.70.0 recommended)
-* **Dioxus CLI** (`dioxus-cli`) is required for running or building the GUI frontend
+- **Rust & Cargo** (≥ 1.70.0 recommended)
+- **Dioxus CLI** (`dioxus-cli`) is required for running or building the GUI frontend
 
 ```bash
 # Verify Rust toolchain
@@ -35,10 +39,11 @@ cargo build --workspace --release
 
 This will produce two runnable binaries under `target/release`:
 
-* `stowr-cli` (the CLI frontend)
-* `stowr-tui` (the TUI frontend)
+- `stowr-cli` (the CLI frontend)
+- `stowr-tui` (the TUI frontend)
 
-> **Note:** The GUI frontend is not built via `cargo build`. See the [GUI section](#3-gui) for details on building and running.
+> **Note:** The GUI frontend is not built via `cargo build`. See the
+> [GUI section](crates/gui/README.md) for details on building and running.
 
 ---
 
@@ -54,25 +59,31 @@ cargo install --path crates/cli
 cargo install --path crates/tui
 ```
 
-> **Tip:** After installing, `stowr-cli` and `stowr-tui` will be available in your `$PATH`.
-> **Note:** The GUI cannot be installed via Cargo; it relies on Dioxus tooling (see below).
+> **Tip:** After installing, `stowr-cli` and `stowr-tui` will be available in
+> your `$PATH`. **Note:** The GUI cannot be installed via Cargo; it relies on
+> Dioxus tooling (see below).
 
 ---
 
 ## ⚙️ Configuration
 
-Currently, **stowr** does not require an external database. All data operations are in-memory or via simple file storage. In the future, a SurrealDB local-mode instance will be provided by the core library, allowing all frontends to communicate with a lightweight, embedded database.
+Currently, **stowr** does not require an external database. All data operations
+are in-memory or via simple file storage. In the future, a SurrealDB local-mode
+instance will be provided by the core library, allowing all frontends to
+communicate with a lightweight, embedded database.
 
 ---
 
 ## 💡 Usage
 
-Usage instructions for each component are maintained in their respective crate directories. For detailed examples and command references, please consult the following:
+Usage instructions for each component are maintained in their respective crate
+directories. For detailed examples and command references, please consult the
+following:
 
-* **Core:** [`crates/core/README.md`](crates/core/README.md)
-* **CLI:** [`crates/cli/README.md`](crates/cli/README.md)
-* **TUI:** [`crates/tui/README.md`](crates/tui/README.md)
-* **GUI:** [`crates/gui/README.md`](crates/gui/README.md)
+- **Core:** [`crates/core/README.md`](crates/core/README.md)
+- **CLI:** [`crates/cli/README.md`](crates/cli/README.md)
+- **TUI:** [`crates/tui/README.md`](crates/tui/README.md)
+- **GUI:** [`crates/gui/README.md`](crates/gui/README.md)
 
 ---
 
@@ -113,25 +124,31 @@ Contributions are more than welcome! Whether you want to fix a typo, add a brand
 
 5. **Open a Pull Request** against `main`.
 
-   * Use descriptive titles and link any relevant issues.
-   * Include before/after screenshots or GIFs if you modify the UI.
+- Use descriptive titles and link any relevant issues.
+- Include before/after screenshots or GIFs if you modify the UI.
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for full details.
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for
+full details.
 
 ---
 
 ## 🔖 Acknowledgments
 
-* Inspired by the mature open‑source projects [homebox](https://github.com/sysadminsmedia/homebox) and [grocy](https://github.com/grocy/grocy); please check them out for more feature‑complete asset management solutions. Stowr is currently focused on a narrower set of use cases tailored to specific needs.
-* Additional terminal UI examples borrowed from the [Ratatui cookbook](https://github.com/tui-rs/examples).
-* GUI design courtesy of the Dioxus starters template.
-* Thanks to all contributors who help make stowr better every day!
+- Inspired by the mature open‑source projects
+  [homebox](https://github.com/sysadminsmedia/homebox) and
+  [grocy](https://github.com/grocy/grocy); please check them out for more
+  feature‑complete asset management solutions. Stowr is currently focused on a
+  narrower set of use cases tailored to specific needs.
+- Additional terminal UI examples borrowed from the [Ratatui
+  cookbook](https://github.com/tui-rs/examples).
+- GUI design courtesy of the Dioxus starters template.
+- Thanks to all contributors who help make stowr better every day!
 
 ---
 
 > “Because no one ever says, ‘I love digging through boxes.’”
-> — *The stowr Team*
+> — _The stowr Team_
