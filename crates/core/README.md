@@ -1,10 +1,15 @@
- stowr-core
+# stowr-core
 
-`stowr-core` provides the shared domain logic and data structures for all stowr frontends. It is intended to be a small, well-tested library that each user interface can build upon. ## Purpose
+`stowr-core` provides the shared domain logic and data structures for all stowr
+front ends. It is intended to be a small, well-tested library that each user
+interface can build upon.
+
+## Purpose
 
 - Define the core data model for assets and collections
 - Expose reusable utilities and abstractions that are UI agnostic
-- Offer a simple storage layer (planned: embedded SurrealDB) so all frontends can operate on the same data
+- Offer a simple storage layer (planned: embedded SurrealDB) so all frontends
+  can operate on the same data
 
 ## Planned Features
 
@@ -15,11 +20,11 @@
 
 This crate is still in its early stages; contributions and ideas are welcome!
 
----
+## How to Implement a New Domain Entity and Repository
 
-# How to Implement a New Domain Entity and Repository
-
-This guide walks you through the idiomatic stowr way to add a new domain entity (such as `Location`, `Asset`, etc.) and its repository, using the project’s generic `Repository` trait and type-safe IDs.
+This guide walks you through the idiomatic stowr way to add a new domain entity
+(such as `Location`, `Asset`, etc.) and its repository, using the project’s
+generic `Repository` trait and type-safe IDs.
 
 > **You’ll create:**
 >
@@ -29,8 +34,7 @@ This guide walks you through the idiomatic stowr way to add a new domain entity 
 > 4. A repository implementation (e.g., `VectorLocationRepo` for in-memory/test)
 > 5. Tests to prove it all works
 
-
-## 1. **Define the Entity ID**
+### 1. **Define the Entity ID**
 
 Use the generic `RepositoryId<T>` to create a unique, type-safe ID for your entity.
 
@@ -41,9 +45,7 @@ enum LocationTag {} // Empty marker type
 type LocationId = RepositoryId<LocationTag>; // ergonomic type alias
 ```
 
----
-
-## 2. **Define the Entity Struct**
+### 2. **Define the Entity Struct**
 
 Make your entity struct. Include its ID and any other relevant fields.
 
@@ -62,9 +64,7 @@ impl Location {
 }
 ```
 
----
-
-## 3. **Define the Repository Trait Alias**
+### 3. **Define the Repository Trait Alias**
 
 For clarity, define a trait alias for your new entity’s repository:
 
@@ -72,11 +72,10 @@ For clarity, define a trait alias for your new entity’s repository:
 trait LocationRepository: Repository<Entity = Location, Id = LocationId> {}
 ```
 
-This enables you to refer to “any repository of `Location`” in a type-safe, concise way.
+This enables you to refer to “any repository of `Location`” in a type-safe,
+concise way.
 
----
-
-## 4. **Implement a Repository (In-Memory Example)**
+### 4. **Implement a Repository (In-Memory Example)**
 
 Here’s a simple in-memory repository using a `Mutex<Vec<Location>>`.
 For real use, you’d implement a DB-backed version.
@@ -115,9 +114,7 @@ impl Repository for VectorLocationRepo {
 impl LocationRepository for VectorLocationRepo {}
 ```
 
----
-
-## 5. **Write a Test**
+### 5. **Write a Test**
 
 Here’s a minimal test for the repository:
 
@@ -135,27 +132,21 @@ async fn vector_location_repo_works() {
 }
 ```
 
----
+### **Pattern Recap**
 
-## **Pattern Recap**
+- **ID**: `RepositoryId<EntityTag>`
+- **Entity Struct**: struct with its typed ID
+- **Repository Trait Alias**: for ergonomic trait bounds
+- **Repository Implementation**: can be memory, DB, etc.
+- **Tests**: Prove your repo works as expected
 
-* **ID**: `RepositoryId<EntityTag>`
-* **Entity Struct**: struct with its typed ID
-* **Repository Trait Alias**: for ergonomic trait bounds
-* **Repository Implementation**: can be memory, DB, etc.
-* **Tests**: Prove your repo works as expected
+### **Why This Pattern?**
 
----
+- **Type-safe IDs**: Impossible to mix up `LocationId`, `AssetId`, etc.
+- **Repository Abstraction**: Swap implementations (e.g., for tests vs. prod) easily.
+- **Consistent, readable, scalable codebase**
 
-## **Why This Pattern?**
-
-* **Type-safe IDs**: Impossible to mix up `LocationId`, `AssetId`, etc.
-* **Repository Abstraction**: Swap implementations (e.g., for tests vs. prod) easily.
-* **Consistent, readable, scalable codebase**
-
----
-
-## **Template for Copy-Paste**
+### **Template for Copy-Paste**
 
 ```rust
 // 1. Marker for ID
@@ -179,8 +170,6 @@ impl FooRepository for VectorFooRepo {}
 #[tokio::test]
 async fn foo_repo_works() { /* ... */ }
 ```
-
----
 
 ### Questions?
 
