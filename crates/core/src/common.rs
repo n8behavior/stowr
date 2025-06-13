@@ -89,33 +89,35 @@ mod tests {
 
     use super::*;
     use crate::common::Repository;
+    use stowr_macro::domain;
 
     // ANCHOR: foo_domain
-    #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
-    enum FooTag {}
-    type FooId = RepositoryId<FooTag>;
+    /// The `#[domain]` attribute will expand [Foo] to have a [RepositoryId]
+    /// and `new()` impl. All struct field should `impl Into<T>`.
+    ///
+    ///    #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+    ///    enum FooTag {}
+    ///    type FooId = RepositoryId<FooTag>;
+    ///
+    ///    impl Foo {
+    ///        fn new(id: FooId, name: impl Into<String>) -> Foo {
+    ///            Foo {
+    ///                id,
+    ///                name: name.into(),
+    ///            }
+    ///        }
+    ///    }
+    ///
+    ///    trait FooRepository: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
+    ///    impl<T> FooRepository for T
+    ///      where T: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
+    ///    type FooRepo = Arc<dyn FooRepository>;
 
-    #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+    #[domain]
     struct Foo {
-        id: FooId,
         name: String,
     }
-
-    impl Foo {
-        fn new(id: FooId, name: impl Into<String>) -> Foo {
-            Foo {
-                id,
-                name: name.into(),
-            }
-        }
-    }
     // ANCHOR_END: foo_domain
-
-    // ANCHOR: foo_repository
-    trait FooRepository: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
-    impl<T> FooRepository for T where T: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
-    type FooRepo = Arc<dyn FooRepository>;
-    // ANCHOR_END: foo_repository
 
     // ANCHOR: vector_foo_repo
     struct VectorFooRepo {

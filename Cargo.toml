@@ -1,8 +1,6 @@
 [workspace]
-members = ["crates/core", "crates/gui", "crates/tui", "crates/cli"]
+members = ["crates/core", "crates/gui", "crates/tui", "crates/cli", "crates/macro"]
 resolver = "2"
-
-[profile]
 
 [profile.wasm-dev]
 inherits = "dev"
