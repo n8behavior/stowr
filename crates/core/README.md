@@ -22,9 +22,10 @@ This crate is still in its early stages; contributions and ideas are welcome!
 
 ## How to Implement a New Domain Entity and Repository
 
-This guide walks you through the idiomatic stowr way to add a new domain entity
-(such as `Location`, `Asset`, etc.) and its repository, using the project’s
-generic `Repository` trait and type-safe IDs.
+Each domain must have at least one `Repository` implementation and a `struct`
+that uses type-safe IDs. This guide walks you through the idiomatic stowr way
+to add a new domain entity (such as `Location`, `Asset`, etc.) and its
+repository, using the project’s `#[domain]` attribute.
 
 > **You’ll create:**
 >
