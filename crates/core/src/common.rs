@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::{fmt, marker::PhantomData, str::FromStr};
 use uuid::Uuid;
 
+// ANCHOR: repository
 /// Base trait for all domain repositories.
 /// - [Entity] is the domain type (e.g. [Asset], [Location]).  
 /// - [Id] is the type of its primary‐key (e.g. [AssetId], [LocationId]).
@@ -20,7 +21,9 @@ pub trait Repository {
     /// Fetch an [Entity] by its ID (or return `None` if not found).
     async fn fetch(&self, id: Self::Id) -> Result<Option<Self::Entity>>;
 }
+// ANCHOR_END: repository
 
+// ANCHOR: Repository_id
 /// The one-and-only underlying ID type, always a v4 UUID.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct RepositoryId<T> {
@@ -28,6 +31,7 @@ pub struct RepositoryId<T> {
     #[serde(skip)]
     _marker: PhantomData<T>,
 }
+// ANCHOR_END: Repository_id
 
 impl<T> Default for RepositoryId<T> {
     fn default() -> Self {
@@ -81,70 +85,75 @@ impl<T> From<RepositoryId<T>> for Uuid {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Mutex;
+    use std::sync::{Arc, Mutex};
 
     use super::*;
     use crate::common::Repository;
 
+    // ANCHOR: foo_domain
     #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
-    enum DummyTag {}
+    enum FooTag {}
+    type FooId = RepositoryId<FooTag>;
 
-    type DummyId = RepositoryId<DummyTag>;
-
-    #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
-    struct Dummy {
-        id: DummyId,
+    #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+    struct Foo {
+        id: FooId,
         name: String,
     }
 
-    impl Dummy {
-        fn new(id: DummyId, name: impl Into<String>) -> Dummy {
-            Dummy {
+    impl Foo {
+        fn new(id: FooId, name: impl Into<String>) -> Foo {
+            Foo {
                 id,
                 name: name.into(),
             }
         }
     }
+    // ANCHOR_END: foo_domain
 
-    struct VectorDummyRepo {
-        db: Mutex<Vec<Dummy>>,
+    // ANCHOR: foo_repository
+    trait FooRepository: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
+    impl<T> FooRepository for T where T: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
+    type FooRepo = Arc<dyn FooRepository>;
+    // ANCHOR_END: foo_repository
+
+    // ANCHOR: vector_foo_repo
+    struct VectorFooRepo {
+        db: Mutex<Vec<Foo>>,
     }
 
-    impl VectorDummyRepo {
+    impl VectorFooRepo {
         fn new() -> Self {
-            VectorDummyRepo {
-                db: Mutex::new(Vec::new()),
+            VectorFooRepo {
+                db: Default::default(),
             }
         }
     }
 
     #[async_trait]
-    impl Repository for VectorDummyRepo {
-        type Entity = Dummy;
-        type Id = DummyId;
+    impl Repository for VectorFooRepo {
+        type Entity = Foo;
+        type Id = FooId;
 
-        async fn create(&self, entity: Dummy) -> Result<Dummy> {
+        async fn create(&self, entity: Foo) -> Result<Foo> {
             let mut guard = self.db.lock().unwrap();
             guard.push(entity.clone());
             Ok(entity)
         }
 
-        async fn fetch(&self, id: DummyId) -> Result<Option<Dummy>> {
+        async fn fetch(&self, id: FooId) -> Result<Option<Foo>> {
             let guard = self.db.lock().unwrap();
             Ok(guard.iter().cloned().find(|d| d.id == id))
         }
     }
-
-    impl DummyRepository for VectorDummyRepo {}
-
-    trait DummyRepository: Repository<Entity = Dummy, Id = DummyId> {}
+    // ANCHOR_END: vector_foo_repo
 
     #[tokio::test]
     async fn dummy_repo_can_create_and_fetch() {
-        let concrete = VectorDummyRepo::new();
-        let repo: &dyn DummyRepository = &concrete;
-        let id = DummyId::new();
-        let item = Dummy::new(id.clone(), "warehouse");
+        let concrete = VectorFooRepo::new();
+        let repo: &dyn FooRepository = &concrete;
+        let id = FooId::new();
+        let item = Foo::new(id.clone(), "warehouse");
         let created = repo.create(item.clone()).await.unwrap();
         assert_eq!(created, item);
 
@@ -154,33 +163,33 @@ mod tests {
 
     #[test]
     fn dummy_new_create_dummies() {
-        let id = DummyId::new();
+        let id = FooId::new();
         let name = "warehouse";
-        let loc = Dummy::new(id.clone(), name);
+        let loc = Foo::new(id.clone(), name);
         assert_eq!(loc.id, id);
         assert_eq!(loc.name, "warehouse");
     }
     #[test]
 
     fn dummy_id_new_produces_unique_ids() {
-        let a = DummyId::new();
-        let b = DummyId::new();
+        let a = FooId::new();
+        let b = FooId::new();
         assert_ne!(a, b, "sequential new() calls should yield different IDs");
     }
 
     #[test]
     fn roundtrip_uuid_via_into_and_from() {
-        let original = DummyId::new();
+        let original = FooId::new();
         let uuid: Uuid = original.clone().into();
-        let reconstructed: DummyId = uuid.into();
+        let reconstructed: FooId = uuid.into();
         assert_eq!(original, reconstructed);
     }
 
     #[test]
     fn parse_from_string_roundtrip() {
-        let original = DummyId::new();
+        let original = FooId::new();
         let s = original.to_string();
-        let parsed = DummyId::from_str(&s).expect("valid uuid string");
+        let parsed = FooId::from_str(&s).expect("valid uuid string");
         assert_eq!(original, parsed);
     }
 }
