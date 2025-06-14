@@ -125,10 +125,10 @@ mod tests {
     }
 
     impl VectorFooRepo {
-        fn new() -> Self {
-            VectorFooRepo {
+        fn new() -> FooRepo {
+            Arc::new(Self {
                 db: Default::default(),
-            }
+            })
         }
     }
 
@@ -152,8 +152,7 @@ mod tests {
 
     #[tokio::test]
     async fn dummy_repo_can_create_and_fetch() {
-        let concrete = VectorFooRepo::new();
-        let repo: &dyn FooRepository = &concrete;
+        let repo = VectorFooRepo::new();
         let id = FooId::new();
         let item = Foo::new(id.clone(), "warehouse");
         let created = repo.create(item.clone()).await.unwrap();
