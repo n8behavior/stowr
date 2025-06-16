@@ -12,3 +12,7 @@ proc-macro2 = "1.0.95"
 quote = "1.0.40"
 serde = { version = "1.0.219", features = ["derive"] }
 syn = { version = "2.0.102", features = ["full"] }
+
+[dev_dependencies]
+serde = { version = "1.0.219", features = ["derive"] }
+trybuild = "1.0.105"

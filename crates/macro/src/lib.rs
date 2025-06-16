@@ -107,27 +107,45 @@ pub fn domain_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
             let names: Vec<_> = fields.iter().map(|(ident, _)| ident).collect();
             let types: Vec<_> = fields.iter().map(|(_, ty)| ty).collect();
 
-            // Generate command and event enum variants
+            // Build enum variants
             cmd_variants.push(quote! { #variant_name { #(#names: #types),* } });
             evt_variants.push(quote! { #variant_name { #(#names: #types),* } });
 
-            // Generate match arms for handle_command
+            // Determine if this is an instance method or static constructor
+            let is_method = m.sig.receiver().is_some();
             let cmd_enum = format_ident!("{}Command", self_ty);
             let evt_enum = format_ident!("{}Event", self_ty);
-            handle_arms.push(quote! {
-                #cmd_enum::#variant_name { #(#names),* } => {
-                    let mut agg = self.clone();
-                    agg.#method(#(#names.clone()),*);
-                    vec![#evt_enum::#variant_name { #(#names),* }]
-                }
-            });
 
-            // Generate match arms for apply_event
-            apply_arms.push(quote! {
-                #evt_enum::#variant_name { #(#names),* } => {
-                    self.#method(#(#names.clone()),*);
-                }
-            });
+            if is_method {
+                // instance method
+                handle_arms.push(quote! {
+                    #cmd_enum::#variant_name { #(#names),* } => {
+                        let mut agg = self.clone();
+                        agg.#method(#(#names.clone()),*);
+                        vec![#evt_enum::#variant_name { #(#names),* }]
+                    }
+                });
+
+                apply_arms.push(quote! {
+                    #evt_enum::#variant_name { #(#names),* } => {
+                        self.#method(#(#names.clone()),*);
+                    }
+                });
+            } else {
+                // static constructor
+                handle_arms.push(quote! {
+                    #cmd_enum::#variant_name { #(#names),* } => {
+                        #self_ty::#method(#(#names.clone()),*);
+                        vec![#evt_enum::#variant_name { #(#names),* }]
+                    }
+                });
+
+                apply_arms.push(quote! {
+                    #evt_enum::#variant_name { #(#names),* } => {
+                        *self = #self_ty::new(#(#names.clone()),*);
+                    }
+                });
+            }
         }
     }
 
