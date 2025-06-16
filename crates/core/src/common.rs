@@ -93,7 +93,9 @@ mod tests {
 
     // ANCHOR: foo_domain
     /// The `#[domain]` attribute will expand [Foo] to have a [RepositoryId]
-    /// and `new()` impl. All struct field should `impl Into<T>`.
+    /// and `new()` impl with struct field declared as `impl Into<T>`.
+    /// Additionally it will create a trait object with blanket impl and a
+    /// type alias to be used by users of concrete Repository implementations.
     ///
     ///    #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
     ///    enum FooTag {}
