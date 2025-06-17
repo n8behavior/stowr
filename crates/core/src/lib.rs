@@ -1,6 +1,8 @@
+mod common;
+
+pub use common::{Aggregate, AggregateError};
 pub mod asset;
 pub mod auth;
-mod common;
 pub mod db;
 pub mod error;
 pub mod group;

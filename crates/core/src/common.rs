@@ -83,13 +83,24 @@ impl<T> From<RepositoryId<T>> for Uuid {
     }
 }
 
+/// in your `common.rs` (or wherever your macros live)
+pub trait Aggregate {
+    type Command;
+    type Event;
+    type Error;
+    fn handle_command(&self, cmd: Self::Command) -> Result<Vec<Self::Event>, Self::Error>;
+    fn apply_event(&mut self, evt: &Self::Event);
+}
+
+pub enum AggregateError {}
+
 #[cfg(test)]
 mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
     use crate::common::Repository;
-    use stowr_macro::domain;
+    use stowr_macro::{command, domain, domain_impl};
 
     // ANCHOR: foo_domain
     /// The `#[domain]` attribute will expand [Foo] to have a [RepositoryId]
@@ -119,7 +130,24 @@ mod tests {
     struct Foo {
         name: String,
     }
+
+    #[domain_impl]
+    impl Foo {
+        #[command]
+        fn rename(&mut self, new_name: String) {
+            self.name = new_name;
+        }
+    }
     // ANCHOR_END: foo_domain
+
+    #[test]
+    fn rename_foo() {
+        let old_name = "Old Name".to_string();
+        let new_name = "New Name".to_string();
+        let mut f = Foo::new(FooId::new(), old_name);
+        f.rename(new_name.clone());
+        assert_eq!(f.name, new_name);
+    }
 
     // ANCHOR: vector_foo_repo
     struct VectorFooRepo {
@@ -172,8 +200,8 @@ mod tests {
         assert_eq!(loc.id, id);
         assert_eq!(loc.name, "warehouse");
     }
-    #[test]
 
+    #[test]
     fn dummy_id_new_produces_unique_ids() {
         let a = FooId::new();
         let b = FooId::new();
