@@ -121,6 +121,31 @@ mod tests {
     ///        }
     ///    }
     ///
+        #[derive(Clone, Debug)]
+        pub enum FooCommand {
+        }
+
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub enum FooEvent {
+        }
+
+        impl Aggregate for #self_ty {
+            type Command = #cmd_enum;
+            type Event   = #evt_enum;
+            type Error   = crate::AggregateError;
+
+            fn handle_command(&self, cmd: Self::Command) -> Result<Vec<Self::Event>, Self::Error> {
+                Ok(match cmd {
+                    #(#handle_arms),*
+                })
+            }
+
+            fn apply_event(&mut self, evt: &Self::Event) {
+                match evt {
+                    #(#apply_arms),*
+                }
+            }
+        }
     ///    trait FooRepository: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
     ///    impl<T> FooRepository for T
     ///      where T: Repository<Entity = Foo, Id = FooId> + Send + Sync {}
